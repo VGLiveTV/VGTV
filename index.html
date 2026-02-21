@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📺 VG TV</title>
+    <style>
+        :root {
+            --bg-dark: #0a0e27;
+            --accent: #00ff9f;
+            --card-bg: rgba(20, 25, 45, 0.9);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Archivo', sans-serif;
+            background: var(--bg-dark);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .header {
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: var(--accent);
+            text-shadow: 0 0 20px rgba(0, 255, 159, 0.5);
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            width: 90%;
+            max-width: 1200px;
+            padding: 20px;
+        }
+
+        .channel-card {
+            background: var(--card-bg);
+            border: 2px solid rgba(0, 255, 159, 0.2);
+            border-radius: 15px;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .channel-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(0, 255, 159, 0.2);
+        }
+
+        .logo-box {
+            width: 100%;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .logo-box img {
+            max-width: 80%;
+            max-height: 80%;
+            object-fit: contain;
+        }
+
+        .channel-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .live-badge {
+            background: #ff4757;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.8rem; }
+            .grid-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>📺 VG TV</h1>
+    </div>
+
+    <div class="grid-container">
+        
+        <a href="https://vglivetv.github.io/vgtv1/" class="channel-card" target="_blank">
+            <div class="logo-box">
+                <img src="https://github.com/VGLiveTV/vgtv1/blob/main/1.png?raw=true" alt="VG TV 1">
+            </div>
+            <div class="channel-name">VG TV 1</div>
+            <div class="live-badge">Live</div>
+        </a>
+
+        <a href="https://vglivetv.github.io/vgtv1/" class="channel-card" target="_blank">
+            <div class="logo-box">
+                <img src="https://github.com/VGLiveTV/vgtv2/blob/main/1.png?raw=true" alt="VG TV 2">
+            </div>
+            <div class="channel-name">VG TV 2</div>
+            <div class="live-badge">Live</div>
+        </a>
+
+    </div>
+
+</body>
+</html>
