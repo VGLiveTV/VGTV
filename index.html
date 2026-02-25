@@ -7,7 +7,6 @@
     <link rel="icon" href="https://raw.githubusercontent.com/VGLiveTV/vgtv/refs/heads/main/fav.png">
     
     <style>
-        /* CHANGED THEME COLOR TO RED (#e50914) */
         :root { --bg: #0f172a; --card: #1e293b; --accent: #e50914; --text: #f8fafc; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
         body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; }
@@ -16,12 +15,6 @@
         .nav { padding: 15px; background: #111; border-bottom: 2px solid var(--accent); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .nav-logo { height: 35px; margin-right: 10px; object-fit: contain; }
         
-        /* Server Toggles */
-        .server-toggles { display: flex; gap: 5px; margin-right: 5px; }
-        .server-btn { padding: 6px 12px; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px; font-size: 12px; cursor: pointer; transition: 0.2s; }
-        .server-btn:hover { background: #444; }
-        .server-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: bold; }
-
         /* Inputs & Selects */
         input[type="text"], select { padding: 8px; border-radius: 4px; border: 1px solid #444; background: #000; color: #fff; outline: none; font-size: 13px; }
         input[type="text"] { flex: 1; min-width: 150px; }
@@ -46,11 +39,6 @@
     <div class="nav">
         <img src="https://raw.githubusercontent.com/VGLiveTV/vgtv/refs/heads/main/logo.png" alt="VG TV Logo" class="nav-logo">
         
-        <div class="server-toggles">
-            <button class="server-btn active" id="btn-srv1" onclick="switchServer(1)">Server 1</button>
-            <button class="server-btn" id="btn-srv2" onclick="switchServer(2)">Server 2</button>
-        </div>
-
         <input type="text" id="search" placeholder="Search Channel...">
         
         <select id="catFilter">
@@ -60,7 +48,7 @@
             <option value="">All Languages</option>
         </select>
         
-        <button class="btn" onclick="fetchBothServers()">REFRESH</button>
+        <button class="btn" onclick="fetchServerData()">REFRESH</button>
     </div>
 
     <div id="grid" class="grid">
@@ -70,52 +58,30 @@
     </div>
 
     <script>
-        const API_URL_1 = "https://allrounderid.pages.dev/api/jiotv.json";
-        const API_URL_2 = "https://allrounderid.pages.dev/api/jiotv2.json";
-        
-        let db1 = [];
-        let db2 = [];
+        const API_URL = "https://allrounderid.pages.dev/api/jiotv2.json";
         let activeDb = []; 
 
-        // 1. Fetch BOTH APIs on load
-        async function fetchBothServers() {
+        // 1. Fetch API data
+        async function fetchServerData() {
             const grid = document.getElementById('grid');
             grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#999; margin-top:50px;">Loading Channels...</div>';
             
             try {
-                try {
-                    const res1 = await fetch(API_URL_1);
-                    if (res1.ok) db1 = await res1.json();
-                } catch(e) { console.warn("Server 1 failed to load"); }
-
-                try {
-                    const res2 = await fetch(API_URL_2);
-                    if (res2.ok) db2 = await res2.json();
-                } catch(e) { console.warn("Server 2 failed to load"); }
-
-                // Sort both alphabetically
-                db1.sort((a, b) => (a.channel_name || "").localeCompare(b.channel_name || ""));
-                db2.sort((a, b) => (a.channel_name || "").localeCompare(b.channel_name || ""));
-                
-                // Default to Server 1 on startup
-                switchServer(1);
+                const res = await fetch(API_URL);
+                if (res.ok) {
+                    activeDb = await res.json();
+                    // Sort alphabetically
+                    activeDb.sort((a, b) => (a.channel_name || "").localeCompare(b.channel_name || ""));
+                    
+                    updateDropdowns("", ""); 
+                    applyFilters();
+                } else {
+                    throw new Error("Server response not OK");
+                }
             } catch (err) {
                 grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:#ef4444; margin-top:50px;">Failed to Load Channels.<br>Check Internet Connection.</div>`;
                 console.error(err);
             }
-        }
-
-        // Switch between Server 1 and Server 2
-        function switchServer(num) {
-            activeDb = (num === 1) ? db1 : db2;
-            
-            document.getElementById('btn-srv1').classList.toggle('active', num === 1);
-            document.getElementById('btn-srv2').classList.toggle('active', num === 2);
-            
-            document.getElementById('search').value = "";
-            
-            updateDropdowns("", ""); 
-            applyFilters();
         }
 
         // 2. Filter Logic
@@ -150,7 +116,7 @@
 
         // 3. Smart Dropdowns 
         function updateDropdowns(currentCat, currentLang) {
-            // --- CATEGORY COUNTS ---
+            // CATEGORY COUNTS
             const catBaseList = activeDb.filter(c => {
                 const lang = (c.channel_language || c.language || c.lang || "Others");
                 return currentLang ? lang === currentLang : true; 
@@ -170,7 +136,7 @@
             });
             catFilter.innerHTML = catHTML;
 
-            // --- LANGUAGE COUNTS ---
+            // LANGUAGE COUNTS
             const langBaseList = activeDb.filter(c => {
                 const cat = c.channel_genre || "Others";
                 return currentCat ? cat === currentCat : true;
@@ -195,7 +161,7 @@
         function render(data) {
             const g = document.getElementById('grid');
             if(data.length === 0) {
-                g.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#555;">No Channels Found in this Server</div>';
+                g.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#555;">No Channels Found</div>';
                 return;
             }
             g.innerHTML = data.map(c => {
@@ -258,7 +224,6 @@
 
         ui.configure({
             controlPanelElements: ['play_pause','time_and_duration','mute','volume','spacer','language','captions','picture_in_picture','quality','fullscreen'],
-            // Updated Player Progress Bar to Red
             seekBarColors: { base: 'white', buffered: 'red', played: 'white' }
         });
 
@@ -336,7 +301,7 @@
         }
 
         // Initialize App
-        fetchBothServers();
+        fetchServerData();
     </script>
 </body>
 </html>
